@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'com.linkedin.pygradle', name: 'pygradle-plugin', version: '0.6.14'
+    }
+}
+
+apply plugin: 'com.linkedin.python-cli'
+
+version = "1.0"
+
+python {
+    testDir = file('tests')
+    forceVersion('pypi', 'pytz', '2016.4')
+}
+
+dependencies {
+    python 'pypi:pbr:3.1.1'
+    python 'pypi:pytz:2016.4'
+    python 'pypi:requests:2.18.4'
+    python 'pypi:SPARQLWrapper:1.8.0'
+    python 'pypi:rdflib:4.2.2'
+    python 'pypi:rdflib-jsonld:0.4.0'
+    python 'pypi:PyLD:0.8.2'
+    python 'pypi:click:6.7'
+    test 'pypi:pbr:3.1.1'
+    test 'pypi:pytz:2016.4'
+}
+
+repositories {
+    // using a local repository
+    ivy{
+        name 'pypi-local'
+        url "/home/user/pivy/"
+        layout 'pattern' , {
+            artifact '[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]'
+            ivy '[organisation]/[module]/[revision]/[module]-[revision].ivy'
+        }
+    }
+    // using a web repository
+    ivy{
+        name 'pypi-remote'
+        url "http://attx-dev:5039/"
+        layout 'pattern' , {
+              artifact '[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]'
+              ivy '[organisation]/[module]/[revision]/[module]-[revision].ivy'
+        }
+    }
+}

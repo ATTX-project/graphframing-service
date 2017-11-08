@@ -161,7 +161,7 @@ setup(
     description='JSON-LD frame PyGradle example',
     entry_points='''
         [console_scripts]
-        ldframe=ldframe.app:main
+        ldframe=ldframe.frameservice:main
     ''',
     author='ATTX Project',
     author_email='stefan.negru@helsinki.fi',

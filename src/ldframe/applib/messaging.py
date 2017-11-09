@@ -5,7 +5,6 @@ import amqpstorm
 from amqpstorm import Message
 from amqpstorm import Connection
 from ldframe.utils.logs import app_logger
-from ldframe.applib.construct_message import replace_message, add_message
 
 
 class ScalableRpcServer(object):
@@ -185,13 +184,14 @@ class Consumer(object):
     def handle_message(self, message):
         """Handle ES index messages."""
         message_data = json.loads(message.body)
-        action = message_data["payload"]["indexingServiceInput"]["activity"]
-        if action == "replace":
-            return str(replace_message(message_data))
-        elif action == "add":
-            return str(add_message(message_data))
-        else:
-            raise KeyError("Missing action or activity not specified.")
+        action = message_data["payload"]["framingServiceInput"]["ldFrame"]
+        return action
+        # if action == "replace":
+        #     return str(replace_message(message_data))
+        # elif action == "add":
+        #     return str(add_message(message_data))
+        # else:
+        #     raise KeyError("Missing action or activity not specified.")
 
     def __call__(self, message):
         """Process the RPC Payload.

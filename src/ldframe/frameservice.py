@@ -59,7 +59,7 @@ class FramingService(gunicorn.app.base.BaseApplication):
 
 # Unless really needed to scale use this function. Otherwise 2 workers suffice.
 def number_of_workers():
-    """Establish the numberb or workers based on cpu_count."""
+    """Establish the number or workers based on cpu_count."""
     return (multiprocessing.cpu_count() * 2) + 1
 
 

@@ -11,7 +11,7 @@ artifact_id = 'GraphFraming'  # Define the IndexingService agent
 agent_role = 'LDframe'  # Define Agent type
 
 
-def handle_fileAdapter(request, input_data):
+def handle_file_adapter(request, input_data):
     """Handle file adapter response."""
     if request.status_code == 404:
         raise IOError("Something went wrong with retrieving the file: {0}. It does not exist!".format(input_data))
@@ -23,14 +23,14 @@ def handle_fileAdapter(request, input_data):
         return request.text
 
 
-def retrieve_data(inputType, input_data):
+def retrieve_data(input_type, input_data):
     """Retrieve data from a specific URI."""
     s = requests.Session()
     allowed = ('http', 'https', 'ftp')
-    local = ('file')
-    if inputType == "Data":
+    local = 'file'
+    if input_type == "Data":
         return input_data
-    elif inputType == "URI":
+    elif input_type == "URI":
         try:
             if urlparse(input_data).scheme in allowed:
                 request = s.get(input_data, timeout=1)
@@ -38,13 +38,13 @@ def retrieve_data(inputType, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-                return handle_fileAdapter(request, input_data)
+                return handle_file_adapter(request, input_data)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise
 
 
-def prov_message(message_data, status, startTime, endTime, replace_index):
+def prov_message(message_data, status, start_time, end_time, replace_index):
     """Construct GM related provenance message."""
     message = dict()
     message["provenance"] = dict()
@@ -52,23 +52,23 @@ def prov_message(message_data, status, startTime, endTime, replace_index):
     message["provenance"]["agent"]["ID"] = artifact_id
     message["provenance"]["agent"]["role"] = agent_role
 
-    activityID = message_data["provenance"]["context"]["activityID"]
-    workflowID = message_data["provenance"]["context"]["workflowID"]
+    activity_id = message_data["provenance"]["context"]["activityID"]
+    workflow_id = message_data["provenance"]["context"]["workflowID"]
 
-    prov_message = message["provenance"]
+    prov_msg = message["provenance"]
 
-    prov_message["context"] = dict()
-    prov_message["context"]["activityID"] = str(activityID)
-    prov_message["context"]["workflowID"] = str(workflowID)
+    prov_msg["context"] = dict()
+    prov_msg["context"]["activityID"] = str(activity_id)
+    prov_msg["context"]["workflowID"] = str(workflow_id)
     if message_data["provenance"]["context"].get('stepID'):
-        prov_message["context"]["stepID"] = message_data["provenance"]["context"]["stepID"]
+        prov_msg["context"]["stepID"] = message_data["provenance"]["context"]["stepID"]
 
-    prov_message["activity"] = dict()
-    prov_message["activity"]["type"] = "ServiceExecution"
-    prov_message["activity"]["title"] = "Indexing Service Operations."
-    prov_message["activity"]["status"] = status
-    prov_message["activity"]["startTime"] = startTime
-    prov_message["activity"]["endTime"] = endTime
+    prov_msg["activity"] = dict()
+    prov_msg["activity"]["type"] = "ServiceExecution"
+    prov_msg["activity"]["title"] = "Indexing Service Operations."
+    prov_msg["activity"]["status"] = status
+    prov_msg["activity"]["startTime"] = start_time
+    prov_msg["activity"]["endTime"] = end_time
     message["provenance"]["input"] = []
     message["provenance"]["output"] = []
     message["payload"] = {}
@@ -118,16 +118,16 @@ def response_message(provenance_data, output):
     message["provenance"]["agent"]["ID"] = artifact_id
     message["provenance"]["agent"]["role"] = agent_role
 
-    activityID = provenance_data["context"]["activityID"]
-    workflowID = provenance_data["context"]["workflowID"]
+    activity_id = provenance_data["context"]["activityID"]
+    workflow_id = provenance_data["context"]["workflowID"]
 
-    prov_message = message["provenance"]
+    context_message = message["provenance"]
 
-    prov_message["context"] = dict()
-    prov_message["context"]["activityID"] = str(activityID)
-    prov_message["context"]["workflowID"] = str(workflowID)
+    context_message["context"] = dict()
+    context_message["context"]["activityID"] = str(activity_id)
+    context_message["context"]["workflowID"] = str(workflow_id)
     if provenance_data["context"].get('stepID'):
-        prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
+        context_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
     message["payload"]["indexingServiceOutput"] = output
     return message

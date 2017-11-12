@@ -12,12 +12,12 @@ class Frame(object):
         self.ld_frame = ld_frame
         self.source_data = source_data
 
-    def _doc_type(self):
+    def _doc_type(self, graph_doc):
         """Parse JSON-LD frame and establish document type."""
         pass
 
-    def _doc_id(self, graph_object):
-        """Parse JSON-LD frame and establish document id."""
+    def _doc_id(self, graph_doc):
+        """Parse JSON-LD frame and establish document ID."""
         pass
 
     def _merge_graphs(self):
@@ -42,5 +42,7 @@ class Frame(object):
 
     def _bulk_data(self, action="index"):
         """Parse JSON-LD frame and establish document type."""
-        header_line = {action: {"_type": self._doc_type(), "_id": self._doc_id()}}
         graphs = self._create_ld()
+        print graphs
+        # for graph_doc in graphs:
+        #     header_line = {action: {"_type": self._doc_type(graph_doc), "_id": self._doc_id(graph_doc)}}

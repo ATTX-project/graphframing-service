@@ -6,6 +6,10 @@ from ldframe.utils.logs import app_logger
 # from ldframe.applib.messaging_publish import Publisher
 from urlparse import urlparse
 from requests_file import FileAdapter
+from os import environ
+
+gm = {'host': environ['GMHOST'] if 'GMHOST' in environ else "localhost",
+      'port': environ['GMPORT'] if 'GMPORT' in environ else 4302}
 
 artifact_id = 'GraphFraming'  # Define the IndexingService agent
 agent_role = 'LDframe'  # Define Agent type
@@ -26,13 +30,17 @@ def handle_file_adapter(request, input_data):
 def retrieve_data(input_type, input_data):
     """Retrieve data from a specific URI."""
     s = requests.Session()
-    allowed = ('http', 'https', 'ftp')
+    allowed = ('http', 'https')
+    ftp = 'ftp'
     local = 'file'
     if input_type == "Data":
         return input_data
     elif input_type == "URI":
         try:
             if urlparse(input_data).scheme in allowed:
+                request = s.get(input_data, timeout=1)
+                return request.text
+            elif urlparse(input_data).scheme in ftp:
                 request = s.get(input_data, timeout=1)
                 return request.text
             elif urlparse(input_data).scheme in local:

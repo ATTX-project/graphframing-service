@@ -1,58 +1,38 @@
 import json
-import requests
 from ldframe.utils.logs import app_logger
-# from datetime import datetime
-# from ldframe.utils.broker import broker
-# from ldframe.applib.messaging_publish import Publisher
-from urlparse import urlparse
-from requests_file import FileAdapter
-from os import environ
-
-gm = {'host': environ['GMHOST'] if 'GMHOST' in environ else "localhost",
-      'port': environ['GMPORT'] if 'GMPORT' in environ else 4302}
+from datetime import datetime
+from ldframe.utils.broker import broker
+from ldframe.applib.messaging_publish import Publisher
+from ldframe.applib.ld_frame import Frame
+from ldframe.utils.file import results_path
 
 artifact_id = 'GraphFraming'  # Define the IndexingService agent
 agent_role = 'LDframe'  # Define Agent type
 
 
-def handle_file_adapter(request, input_data):
-    """Handle file adapter response."""
-    if request.status_code == 404:
-        raise IOError("Something went wrong with retrieving the file: {0}. It does not exist!".format(input_data))
-    elif request.status_code == 403:
-        raise IOError("Something went wrong with retrieving the file: {0}. Accessing it is not permitted!".format(input_data))
-    elif request.status_code == 400:
-        raise IOError("Something went wrong with retrieving the file: {0}. General IOError!".format(input_data))
-    elif request.status_code == 200:
-        return request.text
+def ld_message(message_data):
+    """Replace an old index with a new index for a given alias list."""
+    startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
+    doc_type = message_data["payload"]["framingServiceInput"]["docType"]
+    source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
+    PUBLISHER = Publisher(broker['host'], broker['user'], broker['pass'], broker['provqueue'])
+    frame = Frame(ld_frame, source_data, doc_type)
+    try:
+        output_data = frame._bulk_data()
+        output_uri = results_path(output_data, "json")
+        endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        PUBLISHER.push(prov_message(message_data, "success", startTime, endTime, output_uri))
+        app_logger.info('Generated an JSON-LD frame output at: .')
+        return json.dumps(response_message(message_data["provenance"], output_uri), indent=4, separators=(',', ': '))
+    except Exception as error:
+        endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        PUBLISHER.push(prov_message(message_data, "error", startTime, endTime, output_uri))
+        app_logger.error('Something is wrong: {0}'.format(error))
+        raise
 
 
-def retrieve_data(input_type, input_data):
-    """Retrieve data from a specific URI."""
-    s = requests.Session()
-    allowed = ('http', 'https')
-    ftp = 'ftp'
-    local = 'file'
-    if input_type == "Data":
-        return input_data
-    elif input_type == "URI":
-        try:
-            if urlparse(input_data).scheme in allowed:
-                request = s.get(input_data, timeout=1)
-                return request.text
-            elif urlparse(input_data).scheme in ftp:
-                request = s.get(input_data, timeout=1)
-                return request.text
-            elif urlparse(input_data).scheme in local:
-                s.mount('file://', FileAdapter())
-                request = s.get(input_data)
-                return handle_file_adapter(request, input_data)
-        except Exception as error:
-            app_logger.error('Something is wrong: {0}'.format(error))
-            raise
-
-
-def prov_message(message_data, status, start_time, end_time, replace_index):
+def prov_message(message_data, status, start_time, end_time):
     """Construct GM related provenance message."""
     message = dict()
     message["provenance"] = dict()
@@ -80,45 +60,45 @@ def prov_message(message_data, status, start_time, end_time, replace_index):
     message["provenance"]["input"] = []
     message["provenance"]["output"] = []
     message["payload"] = {}
-    if type(replace_index) is list:
-        for index in replace_index:
-            output_data = {
-                "index": index,
-                "key": "outputIndex",
-                "role": "Dataset"
-            }
-            message["provenance"]["output"].append(output_data)
-    else:
-        output_data = {
-            "index": replace_index,
-            "key": "outputIndex",
-            "role": "Dataset"
-        }
-        message["provenance"]["output"].append(output_data)
+    # if type(replace_index) is list:
+    #     for index in replace_index:
+    #         output_data = {
+    #             "index": index,
+    #             "key": "outputIndex",
+    #             "role": "Dataset"
+    #         }
+    #         message["provenance"]["output"].append(output_data)
+    # else:
+    #     output_data = {
+    #         "index": replace_index,
+    #         "key": "outputIndex",
+    #         "role": "Dataset"
+    #     }
+    #     message["provenance"]["output"].append(output_data)
+    #
+    # alias_list = [str(r) for r in message_data["payload"]["indexingServiceInput"]["targetAlias"]]
+    # source_data = message_data["payload"]["indexingServiceInput"]["sourceData"]
+    #
+    # for elem in source_data:
+    #     key = "index_{0}".format(source_data.index(elem))
+    #     input_data = {
+    #         "aliases": alias_list,
+    #         "key": key,
+    #         "role": "alias"
+    #     }
+    #     if elem["inputType"] == "Data":
+    #         message["payload"][key] = "attx:tempDataset"
+    #     if elem["inputType"] == "URI":
+    #         message["payload"][key] = elem["input"]
+    #     message["provenance"]["input"].append(input_data)
+    # message["payload"]["aliases"] = message_data["payload"]["indexingServiceInput"]["targetAlias"]
+    # message["payload"]["outputIndex"] = replace_index
 
-    alias_list = [str(r) for r in message_data["payload"]["indexingServiceInput"]["targetAlias"]]
-    source_data = message_data["payload"]["indexingServiceInput"]["sourceData"]
-
-    for elem in source_data:
-        key = "index_{0}".format(source_data.index(elem))
-        input_data = {
-            "aliases": alias_list,
-            "key": key,
-            "role": "alias"
-        }
-        if elem["inputType"] == "Data":
-            message["payload"][key] = "attx:tempDataset"
-        if elem["inputType"] == "URI":
-            message["payload"][key] = elem["input"]
-        message["provenance"]["input"].append(input_data)
-    message["payload"]["aliases"] = message_data["payload"]["indexingServiceInput"]["targetAlias"]
-    message["payload"]["outputIndex"] = replace_index
-
-    app_logger.info('Construct provenance metadata for Indexing Service.')
+    app_logger.info('Construct provenance metadata for Graph Framing Service.')
     return json.dumps(message)
 
 
-def response_message(provenance_data, output):
+def response_message(provenance_data, output_uri):
     """Construct Graph Manager response."""
     message = dict()
     message["provenance"] = dict()
@@ -137,5 +117,5 @@ def response_message(provenance_data, output):
     if provenance_data["context"].get('stepID'):
         context_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
-    message["payload"]["indexingServiceOutput"] = output
+    message["payload"]["indexingServiceOutput"] = output_uri
     return message

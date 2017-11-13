@@ -2,35 +2,50 @@ import json
 from pyld import jsonld
 from rdflib import ConjunctiveGraph
 from ldframe.utils.logs import app_logger
+from os import environ
+
+gm = {'host': environ['GMHOST'] if 'GMHOST' in environ else "localhost",
+      'api': environ['GMVER'] if 'GMVER' in environ else "0.2",
+      'port': environ['GMPORT'] if 'GMPORT' in environ else 4302}
 
 
 class Frame(object):
     """Handle Linked Data Framing requests."""
 
-    def __init__(self, ld_frame, source_data):
+    def __init__(self, ld_frame, source_data, doc_type=None):
         """Init Object."""
         self.ld_frame = ld_frame
         self.source_data = source_data
+        self.doc_type = doc_type
 
-    def _doc_type(self, graph_doc):
+    def _doc_type(self):
         """Parse JSON-LD frame and establish document type."""
-        pass
-
-    def _doc_id(self, graph_doc):
-        """Parse JSON-LD frame and establish document ID."""
-        pass
+        if not self.doc_type:
+            return None
+        else:
+            return json.loads(self.ld_frame)["@type"]
 
     def _merge_graphs(self):
         """Merge graphs received for framing."""
-        pass
+        graph = ConjunctiveGraph()
+        for key, unit in enumerate(self.source_data):
+            if "contentType" in unit:
+                content_type = unit["contentType"]
+            else:
+                content_type = "turtle"
+            if "inputType" in unit and unit["inputType"] == "Graph":
+                request_url = 'http://{0}:{1}/{2}/graph?uri={3}'.format(gm['host'], gm['port'], gm['api'], unit["input"])
+                graph.parse(request_url, format=content_type)
+            else:
+                graph.parse(unit["input"], format=content_type)
+        return graph
 
     def _create_ld(self):
         """Create JSON-LD output for the given subject."""
-        graph = ConjunctiveGraph()
-        graph.parse(data=self._merge_graphs, format="turtle")
+        graph = self._merge_graphs().serialize(format="nquads")
         try:
             # pyld likes nquads, by default
-            expanded = jsonld.from_rdf(graph.serialize(format="nquads"))
+            expanded = jsonld.from_rdf(graph)
             framed = jsonld.frame(expanded, json.loads(self.ld_frame))
             result = json.dumps(framed, indent=1, sort_keys=True)
             app_logger.info('Serialized as JSON-LD compact with the frame.')
@@ -42,7 +57,13 @@ class Frame(object):
 
     def _bulk_data(self, action="index"):
         """Parse JSON-LD frame and establish document type."""
-        graphs = self._create_ld()
-        print graphs
-        # for graph_doc in graphs:
-        #     header_line = {action: {"_type": self._doc_type(graph_doc), "_id": self._doc_id(graph_doc)}}
+        graphs = json.loads(self._create_ld())
+        text_file = []
+        for key, graph_doc in enumerate(graphs["@graph"]):
+            header_line = dict()
+            header_line[action] = dict()
+            header_line[action]["_type"] = self._doc_type()
+            header_line[action]["_id"] = graph_doc["@id"]
+            text_file.append(json.dumps(header_line))
+            text_file.append(json.dumps(graph_doc))
+        return "\n".join(text_file)

@@ -53,7 +53,7 @@ def prov_message(message_data, status, start_time, end_time):
 
     prov_msg["activity"] = dict()
     prov_msg["activity"]["type"] = "ServiceExecution"
-    prov_msg["activity"]["title"] = "Indexing Service Operations."
+    prov_msg["activity"]["title"] = "Graph Framing Service Operations."
     prov_msg["activity"]["status"] = status
     prov_msg["activity"]["startTime"] = start_time
     prov_msg["activity"]["endTime"] = end_time

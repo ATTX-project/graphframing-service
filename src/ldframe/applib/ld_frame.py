@@ -28,17 +28,22 @@ class Frame(object):
     def _merge_graphs(self):
         """Merge graphs received for framing."""
         graph = ConjunctiveGraph()
-        for key, unit in enumerate(self.source_data):
-            if "contentType" in unit:
-                content_type = unit["contentType"]
-            else:
-                content_type = "turtle"
-            if "inputType" in unit and unit["inputType"] == "Graph":
-                request_url = 'http://{0}:{1}/{2}/graph?uri={3}'.format(gm['host'], gm['port'], gm['api'], unit["input"])
-                graph.parse(request_url, format=content_type)
-            else:
-                graph.parse(unit["input"], format=content_type)
-        return graph
+        try:
+            for key, unit in enumerate(self.source_data):
+                if "contentType" in unit:
+                    content_type = unit["contentType"]
+                else:
+                    content_type = "turtle"
+                if "inputType" in unit and unit["inputType"] == "Graph":
+                    request_url = 'http://{0}:{1}/{2}/graph?uri={3}'.format(gm['host'], gm['port'], gm['api'], unit["input"])
+                    graph.parse(request_url, format=content_type)
+                else:
+                    graph.parse(unit["input"], format=content_type)
+        except Exception as error:
+            app_logger.error('Something went wrong with merging: {0}'.format(error))
+            raise
+        finally:
+            return graph
 
     def _create_ld(self):
         """Create JSON-LD output for the given subject."""

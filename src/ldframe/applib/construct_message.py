@@ -32,7 +32,7 @@ def ld_message(message_data):
         raise
 
 
-def prov_message(message_data, status, start_time, end_time):
+def prov_message(message_data, status, start_time, end_time, output_uri):
     """Construct GM related provenance message."""
     message = dict()
     message["provenance"] = dict()
@@ -58,41 +58,26 @@ def prov_message(message_data, status, start_time, end_time):
     prov_msg["activity"]["startTime"] = start_time
     prov_msg["activity"]["endTime"] = end_time
     message["provenance"]["input"] = []
-    message["provenance"]["output"] = []
+    message["provenance"]["output"] = dict()
     message["payload"] = {}
-    # if type(replace_index) is list:
-    #     for index in replace_index:
-    #         output_data = {
-    #             "index": index,
-    #             "key": "outputIndex",
-    #             "role": "Dataset"
-    #         }
-    #         message["provenance"]["output"].append(output_data)
-    # else:
-    #     output_data = {
-    #         "index": replace_index,
-    #         "key": "outputIndex",
-    #         "role": "Dataset"
-    #     }
-    #     message["provenance"]["output"].append(output_data)
-    #
-    # alias_list = [str(r) for r in message_data["payload"]["indexingServiceInput"]["targetAlias"]]
-    # source_data = message_data["payload"]["indexingServiceInput"]["sourceData"]
-    #
-    # for elem in source_data:
-    #     key = "index_{0}".format(source_data.index(elem))
-    #     input_data = {
-    #         "aliases": alias_list,
-    #         "key": key,
-    #         "role": "alias"
-    #     }
-    #     if elem["inputType"] == "Data":
-    #         message["payload"][key] = "attx:tempDataset"
-    #     if elem["inputType"] == "URI":
-    #         message["payload"][key] = elem["input"]
-    #     message["provenance"]["input"].append(input_data)
-    # message["payload"]["aliases"] = message_data["payload"]["indexingServiceInput"]["targetAlias"]
-    # message["payload"]["outputIndex"] = replace_index
+    output_data = {
+        "key": "outputIndex",
+        "role": "Dataset",
+        "URI": output_uri
+    }
+    message["provenance"]["output"] = output_data
+    source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
+    for graph in source_data:
+        input_data = {
+            "key": "inputGraphs_{0}".format(source_data.index(graph)),
+            "role": "dataset",
+        }
+        key = "inputGraphs_{0}".format(source_data.index(graph))
+        if graph["inputType"] == "Data":
+            message["payload"][key] = "attx:tempDataset"
+        if graph["inputType"] == "URI" or graph["inputType"] == "Graph":
+            message["payload"][key] = graph["input"]
+        message["provenance"]["input"].append(input_data)
 
     app_logger.info('Construct provenance metadata for Graph Framing Service.')
     return json.dumps(message)

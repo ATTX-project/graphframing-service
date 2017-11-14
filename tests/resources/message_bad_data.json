@@ -1,0 +1,21 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "ingestionwf",
+            "activityID": 1,
+            "stepID": "replaceds"
+        }
+    },
+    "payload": {
+        "framingServiceInput": {
+            "docType": "test",
+            "ldFrame": "askjh",
+            "sourceData": [{
+                    "inputType": "URI",
+                    "contentType": "text/turtle",
+                    "input": "file:///attx-sb-shared/data.ttl"
+                }
+            ]
+        }
+    }
+}

@@ -10,7 +10,7 @@ VERSION: `0.2`
 Using the Graph Framing Service Docker container:
 * `docker pull attxproject/ldframe-service:dev` in the current folder;
 * running the container `docker run -d -p 4303:4303 attxproject/ldframe-service:dev` runs the container in detached mode on the `4302` port (production version should have this port hidden);
-* using the endpoints `http://localhost:4303/$versionNb/health` or the other listed below.
+* using the endpoints `http://localhost:4303/{versionNb}/{endpoint}` or the other listed below.
 
 The version number is specified in `src/ldframe/app.py` under `version` variable.
 

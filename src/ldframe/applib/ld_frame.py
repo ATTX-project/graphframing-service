@@ -37,10 +37,14 @@ class Frame(object):
                 if "inputType" in unit and unit["inputType"] == "Graph":
                     request_url = 'http://{0}:{1}/{2}/graph?uri={3}'.format(gm['host'], gm['port'], gm['api'], unit["input"])
                     graph.parse(request_url, format=content_type)
-                else:
+                elif unit["inputType"] == "URI":
                     graph.parse(unit["input"], format=content_type)
+                elif unit["inputType"] == "Data":
+                    graph.parse(data=unit["input"], format=content_type)
+                else:
+                    raise IOError("Cannot read input source data.")
         except Exception as error:
-            app_logger.error('Something went wrong with merging: {0}'.format(error))
+            app_logger.error('Mergin graphs failed with: {0}'.format(error))
             raise
         finally:
             return graph

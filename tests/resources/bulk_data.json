@@ -1,0 +1,2 @@
+{"index": {"_type": "ex:Library", "_id": "http://example.org/library"}}
+{"ex:contains": {"ex:contains": {"dc:title": "The Introduction", "@id": "http://example.org/library/the-republic#introduction", "@type": "ex:Chapter", "dc:description": "An introductory chapter on The Republic."}, "dc:title": "The Republic", "@id": "http://example.org/library/the-republic", "@type": "ex:Book", "dc:creator": "Plato"}, "@id": "http://example.org/library", "@type": "ex:Library"}

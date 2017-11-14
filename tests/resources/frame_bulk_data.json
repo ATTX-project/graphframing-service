@@ -1,0 +1,4 @@
+{"index": {"_type": "ex:Library", "_id": "http://example.org/library"}}
+{"ex:contains": {"ex:contains": {"dc:title": "The Introduction", "@id": "http://example.org/library/the-republic#introduction", "@type": "ex:Chapter", "dc:description": "An introductory chapter on The Republic."}, "dc:title": "The Republic", "@id": "http://example.org/library/the-republic", "@type": "ex:Book", "dc:creator": "Plato"}, "@id": "http://example.org/library", "@type": "ex:Library"}
+{"index": {"_type": "ex:Library", "_id": "http://example.org/library1"}}
+{"ex:contains": {"ex:contains": {"dc:title": "The Introduction2", "@id": "http://example.org/library/the-republic2#introduction", "@type": "ex:Chapter", "dc:description": "An introductory chapter on The Republic2."}, "dc:title": "The Republic1", "@id": "http://example.org/library/the-republic2", "@type": "ex:Book", "dc:creator": "SMTH"}, "@id": "http://example.org/library1", "@type": "ex:Library"}

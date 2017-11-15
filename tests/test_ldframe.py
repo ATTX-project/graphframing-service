@@ -1,13 +1,12 @@
 import unittest
 import json
 from rdflib import ConjunctiveGraph
-from falcon import testing
 # from ldframe.app import init_api
 from ldframe.applib.ld_frame import Frame
 # from mock import patch
 
 
-class FrameTestCase(testing.TestCase):
+class FrameTestCase(unittest.TestCase):
     """Test for LD Frame operations."""
 
     def setUp(self):

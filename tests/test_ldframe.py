@@ -15,7 +15,7 @@ class FrameTestCase(testing.TestCase):
         pass
 
     def test_bulk_data(self):
-        """Test merge graph endpoint."""
+        """Test bulk data result."""
         with open('tests/resources/bulk_data.json') as datafile:
             result_data = datafile.read()
         with open('tests/resources/message_data.json') as datafile:
@@ -27,7 +27,7 @@ class FrameTestCase(testing.TestCase):
         self.assertEqual(ld_frame._bulk_data(), result_data)
 
     def test_bad_data(self):
-        """Test merge graph endpoint."""
+        """Test merge bad data frame."""
         with open('tests/resources/message_bad_data.json') as datafile:
             message_data = json.load(datafile)
         ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
@@ -38,7 +38,7 @@ class FrameTestCase(testing.TestCase):
             ld_frame._create_ld()
 
     def test_doc_type(self):
-        """Test merge graph endpoint."""
+        """Test get document type."""
         with open('tests/resources/message_data.json') as datafile:
             message_data = json.load(datafile)
         ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
@@ -49,7 +49,7 @@ class FrameTestCase(testing.TestCase):
         assert(result_data == ld_frame._doc_type())
 
     def test_merge_data(self):
-        """Test merge graph endpoint."""
+        """Test merge graphs."""
         with open('tests/resources/message_data.json') as datafile:
             message_data = json.load(datafile)
         ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]

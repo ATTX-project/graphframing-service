@@ -15,8 +15,8 @@ class ConstructFrameTestCase(unittest.TestCase):
     @patch('ldframe.applib.construct_message.Publisher.push')
     @patch('ldframe.utils.file.results_path')
     @patch.object(Frame, '_bulk_data')
-    def test_retrieve_called(self, mock, file_mock, publis_mock):
-        """Test if retrieve graph data was called."""
+    def test_retrieve_called(self, mock, file_mock, publish_mock):
+        """Test if LD message data was called."""
         with open('tests/resources/frame_bulk_data.json') as datafile:
             result_data = datafile.read()
         with open('tests/resources/message_bulk_data.json') as datafile:
@@ -27,7 +27,7 @@ class ConstructFrameTestCase(unittest.TestCase):
 
     @patch.object(Frame, '_bulk_data')
     def test_ld_error(self, mock):
-        """Test if replace raises an error was called."""
+        """Test if ld message raises an error was called."""
         with open('tests/resources/message_bulk_data.json') as datafile:
             message = json.load(datafile)
         with self.assertRaises(UnboundLocalError):

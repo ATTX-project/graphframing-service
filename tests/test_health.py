@@ -34,6 +34,8 @@ class TestFrame(appHealthTest):
         httpretty.register_uri(httpretty.GET, "http://localhost:4303/health", status=200)
         result = self.simulate_get('/health')
         assert(result.status == falcon.HTTP_200)
+        httpretty.disable()
+        httpretty.reset()
 
     @httpretty.activate
     def test_health_response(self):
@@ -45,6 +47,8 @@ class TestFrame(appHealthTest):
         json_response = {"framingService": "Running", "messageBroker": "Running"}
         assert(json_response == json.loads(response))
         assert(result.content == response)
+        httpretty.disable()
+        httpretty.reset()
 
     @patch('ldframe.api.healthcheck.healthcheck_response')
     def test_actual_health_response(self, mock):
@@ -53,6 +57,8 @@ class TestFrame(appHealthTest):
         response = healthcheck_response("Running")
         json_response = {"framingService": "Running", "messageBroker": "Not Running"}
         assert(json_response == json.loads(response))
+        httpretty.disable()
+        httpretty.reset()
 
 
 if __name__ == "__main__":

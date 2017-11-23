@@ -44,7 +44,7 @@ class Frame(object):
                 else:
                     raise IOError("Cannot read input source data.")
         except Exception as error:
-            app_logger.error('Mergin graphs failed with: {0}'.format(error))
+            app_logger.error('Merging graphs failed with: {0}'.format(error))
             raise
         finally:
             return graph

@@ -6,6 +6,7 @@ from amqpstorm import Message
 from amqpstorm import Connection
 from ldframe.utils.logs import app_logger
 from ldframe.applib.construct_message import ld_message
+from ldframe.applib.construct_message import response_message
 
 
 class ScalableRpcServer(object):
@@ -189,7 +190,7 @@ class Consumer(object):
         if ld_frame:
             return str(ld_message(message_data))
         else:
-            raise KeyError("Missing action or activity not specified.")
+            raise KeyError("Missing LD Frame; not specified.")
 
     def __call__(self, message):
         """Process the RPC Payload.
@@ -205,8 +206,8 @@ class Consumer(object):
                 'correlation_id': message.correlation_id
             }
             error_message = "Error Type: {0}, with message: {1}".format(e.__class__.__name__, e.message)
-            processed_message = {"status": "Error",
-                                 "statusMessage": error_message}
+            message_data = json.loads(message.body)
+            processed_message = response_message(message_data["provenance"], status="error", status_messsage=error_message)
             response = Message.create(message.channel, str(json.dumps(processed_message, indent=4, separators=(',', ': '))), properties)
             response.publish(message.reply_to)
             message.reject(requeue=False)

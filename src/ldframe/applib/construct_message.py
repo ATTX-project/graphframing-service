@@ -6,8 +6,9 @@ from ldframe.applib.messaging_publish import Publisher
 from ldframe.applib.ld_frame import Frame
 from ldframe.utils.file import results_path
 
-artifact_id = 'GraphFraming'  # Define the IndexingService agent
-agent_role = 'LDframe'  # Define Agent type
+artifact_id = "GraphFraming"  # Define the IndexingService agent
+agent_role = "LDframe"  # Define Agent type
+output_key = "framingServiceOutput"
 
 
 def ld_message(message_data):
@@ -23,8 +24,11 @@ def ld_message(message_data):
         output_uri = results_path(output_data, "json")
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime, output_uri))
-        app_logger.info('Generated an JSON-LD frame output at: .')
-        return json.dumps(response_message(message_data["provenance"], output_uri), indent=4, separators=(',', ': '))
+        output_obj = {"contentType": "elasticbulkfile",
+                      "outputType": "URI",
+                      "output": output_uri}
+        app_logger.info('Generated an JSON-LD frame output at: {0}.'.format(output_uri))
+        return json.dumps(response_message(message_data["provenance"], status="success", output=output_obj), indent=4, separators=(',', ': '))
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime, output_uri))
@@ -83,7 +87,7 @@ def prov_message(message_data, status, start_time, end_time, output_uri):
     return json.dumps(message)
 
 
-def response_message(provenance_data, output_uri):
+def response_message(provenance_data, status, status_messsage=None, output=None):
     """Construct Graph Manager response."""
     message = dict()
     message["provenance"] = dict()
@@ -94,13 +98,17 @@ def response_message(provenance_data, output_uri):
     activity_id = provenance_data["context"]["activityID"]
     workflow_id = provenance_data["context"]["workflowID"]
 
-    context_message = message["provenance"]
+    prov_message = message["provenance"]
 
-    context_message["context"] = dict()
-    context_message["context"]["activityID"] = str(activity_id)
-    context_message["context"]["workflowID"] = str(workflow_id)
+    prov_message["context"] = dict()
+    prov_message["context"]["activityID"] = str(activity_id)
+    prov_message["context"]["workflowID"] = str(workflow_id)
     if provenance_data["context"].get('stepID'):
-        context_message["context"]["stepID"] = provenance_data["context"]["stepID"]
+        prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
-    message["payload"]["indexingServiceOutput"] = output_uri
+    message["payload"]["status"] = status
+    if status_messsage:
+        message["payload"]["statusMessage"] = status_messsage
+    if output:
+        message["payload"][output_key] = output
     return message

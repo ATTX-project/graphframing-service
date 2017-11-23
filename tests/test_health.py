@@ -5,7 +5,6 @@ import json
 from falcon import testing
 from ldframe.app import init_api
 from ldframe.api.healthcheck import healthcheck_response
-from mock import patch
 
 
 class appHealthTest(testing.TestCase):
@@ -47,16 +46,6 @@ class TestFrame(appHealthTest):
         json_response = {"framingService": "Running", "messageBroker": "Running"}
         assert(json_response == json.loads(response))
         assert(result.content == response)
-        httpretty.disable()
-        httpretty.reset()
-
-    @patch('ldframe.api.healthcheck.healthcheck_response')
-    def test_actual_health_response(self, mock):
-        """Test if json response format."""
-        mock.return_value = {"framingService": "Running", "messageBroker": "Not Running"}
-        response = healthcheck_response("Running")
-        json_response = {"framingService": "Running", "messageBroker": "Not Running"}
-        assert(json_response == json.loads(response))
         httpretty.disable()
         httpretty.reset()
 

@@ -20,8 +20,8 @@ class Frame(object):
 
     def _doc_type(self):
         """Parse JSON-LD frame and establish document type."""
-        if not self.doc_type:
-            return None
+        if self.doc_type:
+            return self.doc_type
         else:
             return json.loads(self.ld_frame)["@type"]
 

@@ -44,6 +44,16 @@ class FrameTestCase(unittest.TestCase):
         doc_type = message_data["payload"]["framingServiceInput"]["docType"]
         source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
         ld_frame = Frame(ld_frame, source_data, doc_type)
+        result_data = "test"
+        assert(result_data == ld_frame._doc_type())
+
+    def test_doc_type_frame(self):
+        """Test get document type from frame."""
+        with open('tests/resources/message_data_nodoc.json') as datafile:
+            message_data = json.load(datafile)
+        ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
+        source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
+        ld_frame = Frame(ld_frame, source_data)
         result_data = "ex:Library"
         assert(result_data == ld_frame._doc_type())
 

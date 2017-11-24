@@ -1,0 +1,20 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "ingestionwf",
+            "activityID": 1,
+            "stepID": "replaceds"
+        }
+    },
+    "payload": {
+        "framingServiceInput": {
+            "ldFrame": "{\r\n  \"@context\": {\r\n    \"dc\": \"http:\/\/purl.org\/dc\/elements\/1.1\/\",\r\n    \"ex\": \"http:\/\/example.org\/vocab#\"\r\n  },\r\n  \"@type\": \"ex:Library\",\r\n  \"ex:contains\": {\r\n    \"@type\": \"ex:Book\",\r\n    \"ex:contains\": {\r\n      \"@type\": \"ex:Chapter\"\r\n    }\r\n  }\r\n}",
+            "sourceData": [{
+                    "inputType": "Data",
+                    "contentType": "text/turtle",
+                    "input": "@prefix ns0: <http:\/\/example.org\/vocab#> .\r\n@prefix dc11: <http:\/\/purl.org\/dc\/elements\/1.1\/> .\r\n@prefix xsd: <http:\/\/www.w3.org\/2001\/XMLSchema#> .\r\n\r\n<http:\/\/example.org\/library>\r\n  a <http:\/\/example.org\/vocab#Library> ;\r\n  ns0:contains <http:\/\/example.org\/library\/the-republic> .\r\n\r\n<http:\/\/example.org\/library\/the-republic>\r\n  a ns0:Book ;\r\n  ns0:contains <http:\/\/example.org\/library\/the-republic#introduction> ;\r\n  dc11:creator \"Plato\"^^xsd:string ;\r\n  dc11:title \"The Republic\"^^xsd:string .\r\n\r\n<http:\/\/example.org\/library\/the-republic#introduction>\r\n  a ns0:Chapter ;\r\n  dc11:description \"An introductory chapter on The Republic.\"^^xsd:string ;\r\n  dc11:title \"The Introduction\"^^xsd:string ."
+                }
+            ]
+        }
+    }
+}

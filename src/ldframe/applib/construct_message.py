@@ -15,7 +15,9 @@ def ld_message(message_data):
     """Replace an old index with a new index for a given alias list."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
-    doc_type = message_data["payload"]["framingServiceInput"]["docType"]
+    doc_type = None
+    if message_data["payload"]["framingServiceInput"].get('docType'):
+        doc_type = message_data["payload"]["framingServiceInput"]["docType"]
     source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
     PUBLISHER = Publisher(broker['host'], broker['user'], broker['pass'], broker['provqueue'])
     frame = Frame(ld_frame, source_data, doc_type)

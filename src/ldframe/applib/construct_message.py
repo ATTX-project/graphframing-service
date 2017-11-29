@@ -65,19 +65,19 @@ def prov_message(message_data, status, start_time, end_time, output_uri):
     prov_msg["activity"]["startTime"] = start_time
     prov_msg["activity"]["endTime"] = end_time
     message["provenance"]["input"] = []
-    message["provenance"]["output"] = dict()
+    message["provenance"]["output"] = []
     message["payload"] = {}
     output_data = {
-        "key": "outputIndex",
-        "role": "Dataset",
-        "URI": output_uri
+        "key": "outputFramed",
+        "role": "Dataset"
     }
-    message["provenance"]["output"] = output_data
+    message["provenance"]["output"].append(output_data)
+    message["payload"]["outputFramed"] = str(output_uri)
     source_data = message_data["payload"]["framingServiceInput"]["sourceData"]
     for graph in source_data:
         input_data = {
             "key": "inputGraphs_{0}".format(source_data.index(graph)),
-            "role": "dataset",
+            "role": "Dataset",
         }
         key = "inputGraphs_{0}".format(source_data.index(graph))
         if graph["inputType"] == "Data":
@@ -87,6 +87,7 @@ def prov_message(message_data, status, start_time, end_time, output_uri):
         message["provenance"]["input"].append(input_data)
 
     app_logger.info('Construct provenance metadata for Graph Framing Service.')
+    print json.dumps(message)
     return json.dumps(message)
 
 

@@ -25,7 +25,8 @@ def ld_message(message_data):
         output_data = frame._bulk_data()
         output_uri = results_path(output_data, "json")
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        PUBLISHER.push(prov_message(message_data, "success", startTime, endTime, output_uri))
+        if bool(message_data["provenance"]):
+            PUBLISHER.push(prov_message(message_data, "success", startTime, endTime, output_uri))
         output_obj = {"contentType": "elasticbulkfile",
                       "outputType": "URI",
                       "output": output_uri}
@@ -93,20 +94,21 @@ def response_message(provenance_data, status, status_messsage=None, output=None)
     """Construct Graph Manager response."""
     message = dict()
     message["provenance"] = dict()
-    message["provenance"]["agent"] = dict()
-    message["provenance"]["agent"]["ID"] = artifact_id
-    message["provenance"]["agent"]["role"] = agent_role
+    if bool(provenance_data):
+        message["provenance"]["agent"] = dict()
+        message["provenance"]["agent"]["ID"] = artifact_id
+        message["provenance"]["agent"]["role"] = agent_role
 
-    activity_id = provenance_data["context"]["activityID"]
-    workflow_id = provenance_data["context"]["workflowID"]
+        activity_id = provenance_data["context"]["activityID"]
+        workflow_id = provenance_data["context"]["workflowID"]
 
-    prov_message = message["provenance"]
+        prov_message = message["provenance"]
 
-    prov_message["context"] = dict()
-    prov_message["context"]["activityID"] = str(activity_id)
-    prov_message["context"]["workflowID"] = str(workflow_id)
-    if provenance_data["context"].get('stepID'):
-        prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
+        prov_message["context"] = dict()
+        prov_message["context"]["activityID"] = str(activity_id)
+        prov_message["context"]["workflowID"] = str(workflow_id)
+        if provenance_data["context"].get('stepID'):
+            prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
     message["payload"]["status"] = status
     if status_messsage:

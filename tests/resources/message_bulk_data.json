@@ -1,0 +1,25 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "ingestionwf",
+            "activityID": 1,
+            "stepID": "replaceds"
+        }
+    },
+    "payload": {
+        "framingServiceInput": {
+            "docType": "test",
+            "ldFrame": "{\r\n  \"@context\": {\r\n    \"dc\": \"http:\/\/purl.org\/dc\/elements\/1.1\/\",\r\n    \"ex\": \"http:\/\/example.org\/vocab#\"\r\n  },\r\n  \"@type\": \"ex:Library\",\r\n  \"ex:contains\": {\r\n    \"@type\": \"ex:Book\",\r\n    \"ex:contains\": {\r\n      \"@type\": \"ex:Chapter\"\r\n    }\r\n  }\r\n}",
+            "sourceData": [{
+                    "inputType": "URI",
+                    "contentType": "text/turtle",
+                    "input": "file:///attx-sb-shared/graph-data.ttl"
+                },
+                {
+                    "inputType": "Graph",
+                    "input": "http://example.org/books"
+                }
+            ]
+        }
+    }
+}

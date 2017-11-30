@@ -1,5 +1,5 @@
-from rdflib import Namespace
-from ConfigParser import SafeConfigParser
+from rdflib import Namespace, URIRef
+# from ConfigParser import SafeConfigParser
 
 PROV = Namespace('http://www.w3.org/ns/prov#')
 SD = Namespace('http://www.w3.org/ns/sparql-service-description#')
@@ -28,10 +28,18 @@ def bind_prefix(graph):
     return graph
 
 
-# TBD
-def namspace_config(config_file):
-    """Read Namespace config from file."""
-    parser = SafeConfigParser()
-    parser.read(config_file)
+def create_uri(namespace, string, connector=None):
+    """Add prefix to a certain string."""
+    if connector:
+        return URIRef("{0}{1}_{2}".format(namespace, string, connector))
+    else:
+        return URIRef("{0}{1}".format(namespace, string))
 
-    pass
+
+# TBD
+# def namspace_config(config_file):
+#     """Read Namespace config from file."""
+#     parser = SafeConfigParser()
+#     parser.read(config_file)
+#
+#     pass

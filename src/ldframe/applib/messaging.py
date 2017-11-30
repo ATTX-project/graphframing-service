@@ -184,7 +184,7 @@ class Consumer(object):
             self.channel.close()
 
     def handle_message(self, message):
-        """Handle ES index messages."""
+        """Handle LD frame for messages."""
         message_data = json.loads(message.body)
         ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
         if ld_frame:

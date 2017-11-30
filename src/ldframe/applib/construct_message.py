@@ -40,7 +40,7 @@ def ld_message(message_data):
 
 
 def prov_message(message_data, status, start_time, end_time, output_uri):
-    """Construct GM related provenance message."""
+    """Construct Graph Framer related provenance message."""
     message = dict()
     message["provenance"] = dict()
     message["provenance"]["agent"] = dict()
@@ -87,12 +87,11 @@ def prov_message(message_data, status, start_time, end_time, output_uri):
         message["provenance"]["input"].append(input_data)
 
     app_logger.info('Construct provenance metadata for Graph Framing Service.')
-    print json.dumps(message)
     return json.dumps(message)
 
 
 def response_message(provenance_data, status, status_messsage=None, output=None):
-    """Construct Graph Manager response."""
+    """Construct Graph Framer response."""
     message = dict()
     message["provenance"] = dict()
     if bool(provenance_data):

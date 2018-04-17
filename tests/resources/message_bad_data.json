@@ -11,7 +11,7 @@
             "docType": "test",
             "ldFrame": "askjh",
             "sourceData": [{
-                    "inputType": "URI",
+                    "inputType": "Graph",
                     "contentType": "text/turtle",
                     "input": "file:///attx-sb-shared/data.ttl"
                 }

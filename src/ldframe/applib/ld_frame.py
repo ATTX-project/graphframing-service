@@ -3,7 +3,7 @@ from pyld import jsonld
 from rdflib import ConjunctiveGraph
 from ldframe.utils.logs import app_logger
 from os import environ
-from ldframe.utils.convert import pyld_jsonld_from_rdflib_graph
+from ldframe.applib.convert import pyld_jsonld_from_rdflib_graph
 
 gm = {'host': environ['GMHOST'] if 'GMHOST' in environ else "localhost",
       'api': environ['GMVER'] if 'GMVER' in environ else "0.2",
@@ -52,10 +52,13 @@ class Frame(object):
 
     def _create_ld(self):
         """Create JSON-LD output for the given subject."""
-        graph = self._merge_graphs().serialize(format="nquads")
+        graph = self._merge_graphs()
+        print(graph.serialize(format="turtle"))
+        # result = None
         try:
             # pyld likes nquads, by default
             expanded = pyld_jsonld_from_rdflib_graph(graph)
+            print(expanded)
             framed = jsonld.frame(expanded, json.loads(self.ld_frame))
             result = json.dumps(framed, indent=1, sort_keys=True)
             app_logger.info('Serialized as JSON-LD compact with the frame.')

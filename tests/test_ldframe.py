@@ -15,10 +15,10 @@ class FrameTestCase(unittest.TestCase):
 
     def test_bulk_data(self):
         """Test bulk data result."""
-        with open('tests/resources/bulk_data.json') as datafile:
-            result_data = datafile.read()
-        with open('tests/resources/message_data.json') as datafile:
-            message_data = json.load(datafile)
+        with open('tests/resources/bulk_data.json') as datafile1:
+            result_data = datafile1.read()
+        with open('tests/resources/message_data.json') as datafile2:
+            message_data = json.load(datafile2)
         ld_frame = message_data["payload"]["framingServiceInput"]["ldFrame"]
         doc_type = message_data["payload"]["framingServiceInput"]["docType"]
         source_data = message_data["payload"]["framingServiceInput"]["sourceData"]

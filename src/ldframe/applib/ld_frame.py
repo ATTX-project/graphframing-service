@@ -53,12 +53,10 @@ class Frame(object):
     def _create_ld(self):
         """Create JSON-LD output for the given subject."""
         graph = self._merge_graphs()
-        print(graph.serialize(format="turtle"))
         # result = None
         try:
             # pyld likes nquads, by default
             expanded = pyld_jsonld_from_rdflib_graph(graph)
-            print(expanded)
             framed = jsonld.frame(expanded, json.loads(self.ld_frame))
             result = json.dumps(framed, indent=1, sort_keys=True)
             app_logger.info('Serialized as JSON-LD compact with the frame.')
